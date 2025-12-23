@@ -1,0 +1,13 @@
+# Playwright test screenshots
+.playwright-mcp/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories
+.vscode/
+.idea/
+
+# Node modules (if added later)
+node_modules/

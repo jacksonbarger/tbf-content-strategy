@@ -1,0 +1,2455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Bottom Feeder - Implementation Plan</title>
+    <style>
+        :root {
+            --primary: #0077B6;
+            --primary-dark: #005a8c;
+            --accent: #00B4D8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--gray-100);
+            min-height: 100vh;
+            color: var(--gray-800);
+        }
+
+        /* Top Navigation Bar */
+        .top-bar {
+            background: #000;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-svg {
+            height: 50px;
+            width: auto;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+        .logo-the {
+            font-size: 0.7rem;
+            font-weight: 800;
+            font-style: italic;
+            letter-spacing: 0.05em;
+        }
+
+        .logo-main {
+            font-size: 1.5rem;
+            font-weight: 900;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-target {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.3rem;
+            height: 1.3rem;
+            background: white;
+            border-radius: 50%;
+            margin: 0 1px;
+            position: relative;
+        }
+
+        .logo-target::before {
+            content: '';
+            width: 0.7rem;
+            height: 0.7rem;
+            background: black;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .logo-target::after {
+            content: '';
+            width: 0.25rem;
+            height: 0.25rem;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .logo-tagline {
+            font-size: 0.6rem;
+            font-style: italic;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        .logo-divider {
+            width: 1px;
+            height: 40px;
+            background: var(--gray-600);
+        }
+
+        .plan-title {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .plan-title-main {
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .plan-title-sub {
+            font-size: 0.75rem;
+            color: var(--gray-400);
+        }
+
+        .deadline-badge {
+            background: var(--danger);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .deadline-badge .pulse {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--gray-900);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            margin-top: 0.25rem;
+        }
+
+        .stat-card.highlight {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+        }
+
+        .stat-card.highlight .stat-value,
+        .stat-card.highlight .stat-label {
+            color: white;
+        }
+
+        .stat-card.danger .stat-value {
+            color: var(--danger);
+        }
+
+        /* Progress Section */
+        .progress-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-header h2 {
+            font-size: 1.25rem;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .progress-bar-container {
+            background: var(--gray-200);
+            border-radius: 1rem;
+            height: 2rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 1rem;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.875rem;
+            min-width: 3rem;
+        }
+
+        .progress-bar.empty {
+            background: var(--gray-300);
+            color: var(--gray-600);
+        }
+
+        /* Timeline */
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            position: relative;
+            padding: 0 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 1.5rem;
+            left: 2rem;
+            right: 2rem;
+            height: 4px;
+            background: var(--gray-200);
+            z-index: 0;
+        }
+
+        .timeline-progress {
+            position: absolute;
+            top: 1.5rem;
+            left: 2rem;
+            height: 4px;
+            background: linear-gradient(90deg, var(--success) 0%, var(--accent) 100%);
+            z-index: 1;
+            transition: width 0.5s ease;
+            border-radius: 2px;
+        }
+
+        .timeline-point {
+            text-align: center;
+            z-index: 2;
+            flex: 1;
+            max-width: 150px;
+        }
+
+        .timeline-dot {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid var(--gray-200);
+            margin: 0 auto 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--gray-400);
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .timeline-dot.active {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #e0f2fe;
+        }
+
+        .timeline-dot.complete {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .timeline-dot.current {
+            border-color: var(--warning);
+            color: var(--warning);
+            background: #fef3c7;
+            animation: currentPulse 2s infinite;
+        }
+
+        @keyframes currentPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+        }
+
+        .timeline-label {
+            font-weight: 600;
+            color: var(--gray-800);
+            font-size: 0.875rem;
+        }
+
+        .timeline-date {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 0.25rem;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 0.625rem 1.25rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn.primary {
+            background: var(--gray-900);
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: var(--gray-700);
+        }
+
+        .action-btn.secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-200);
+        }
+
+        .action-btn.secondary:hover {
+            background: var(--gray-200);
+        }
+
+        /* Phase Grid */
+        .phases-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .phase-card {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phase-card:hover {
+            box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.15);
+        }
+
+        .phase-card.current {
+            ring: 2px solid var(--warning);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+        }
+
+        .phase-header {
+            padding: 1.25rem 1.5rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .phase-1 .phase-header { background: linear-gradient(135deg, #1e3a5f 0%, #0077B6 100%); }
+        .phase-2 .phase-header { background: linear-gradient(135deg, #0077B6 0%, #00B4D8 100%); }
+        .phase-3 .phase-header { background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%); }
+        .phase-4 .phase-header { background: linear-gradient(135deg, #047857 0%, #10b981 100%); }
+
+        .phase-info {
+            flex: 1;
+        }
+
+        .phase-number {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .phase-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0.25rem 0;
+        }
+
+        .phase-dates {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .phase-progress-circle {
+            width: 60px;
+            height: 60px;
+            position: relative;
+        }
+
+        .phase-progress-circle svg {
+            transform: rotate(-90deg);
+        }
+
+        .phase-progress-circle .bg {
+            fill: none;
+            stroke: rgba(255,255,255,0.2);
+            stroke-width: 6;
+        }
+
+        .phase-progress-circle .progress {
+            fill: none;
+            stroke: white;
+            stroke-width: 6;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .phase-progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.875rem;
+            font-weight: 700;
+        }
+
+        .phase-body {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phase-goal {
+            background: var(--gray-50);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .phase-1 .phase-goal { border-left-color: #0077B6; }
+        .phase-2 .phase-goal { border-left-color: #00B4D8; }
+        .phase-3 .phase-goal { border-left-color: #f59e0b; }
+        .phase-4 .phase-goal { border-left-color: #10b981; }
+
+        .phase-goal-label {
+            font-size: 0.625rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--gray-500);
+            margin-bottom: 0.25rem;
+        }
+
+        .phase-goal-text {
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 0.9rem;
+        }
+
+        /* Milestone Banner */
+        .milestone {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid #f59e0b;
+            border-radius: 0.75rem;
+            padding: 0.875rem 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .milestone-icon {
+            font-size: 1.25rem;
+        }
+
+        .milestone-text {
+            flex: 1;
+        }
+
+        .milestone-title {
+            font-weight: 700;
+            color: var(--gray-800);
+            font-size: 0.875rem;
+        }
+
+        .milestone-date {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+
+        /* Tasks */
+        .task-list {
+            list-style: none;
+            flex: 1;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            margin: 0 -0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .task-item:hover {
+            background: var(--gray-50);
+        }
+
+        .task-checkbox {
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid var(--gray-300);
+            border-radius: 0.375rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.15s ease;
+            margin-top: 0.125rem;
+        }
+
+        .task-item.completed .task-checkbox {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .task-checkbox svg {
+            width: 12px;
+            height: 12px;
+            opacity: 0;
+            color: white;
+            transition: opacity 0.15s ease;
+        }
+
+        .task-item.completed .task-checkbox svg {
+            opacity: 1;
+        }
+
+        .task-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .task-title {
+            font-weight: 500;
+            color: var(--gray-700);
+            font-size: 0.875rem;
+            line-height: 1.4;
+            transition: all 0.15s ease;
+        }
+
+        .task-item.completed .task-title {
+            color: var(--gray-400);
+            text-decoration: line-through;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.375rem;
+            flex-wrap: wrap;
+        }
+
+        /* Task Header with Dropdown Arrow */
+        .task-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+
+        .dropdown-arrow {
+            font-size: 0.7rem;
+            color: var(--gray-400);
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .task-item.expanded .dropdown-arrow {
+            transform: rotate(90deg);
+            color: var(--primary);
+        }
+
+        /* Task Instructions Dropdown */
+        .task-instructions {
+            margin-top: 0.75rem;
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: 0.5rem;
+            border-left: 3px solid var(--primary);
+            font-size: 0.8rem;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.3s ease, opacity 0.2s ease, margin 0.2s ease, padding 0.2s ease;
+            margin-top: 0;
+            padding: 0 1rem;
+        }
+
+        .task-item.expanded .task-instructions {
+            max-height: 500px;
+            opacity: 1;
+            margin-top: 0.75rem;
+            padding: 1rem;
+        }
+
+        .phase-1 .task-instructions { border-left-color: #0077B6; }
+        .phase-2 .task-instructions { border-left-color: #00B4D8; }
+        .phase-3 .task-instructions { border-left-color: #f59e0b; }
+        .phase-4 .task-instructions { border-left-color: #10b981; }
+
+        .task-instructions h4 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+        }
+
+        .task-instructions ol {
+            margin: 0;
+            padding-left: 1.25rem;
+            color: var(--gray-700);
+        }
+
+        .task-instructions ol li {
+            margin-bottom: 0.375rem;
+            line-height: 1.4;
+        }
+
+        .task-instructions ol li:last-child {
+            margin-bottom: 0;
+        }
+
+        .task-resources {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--gray-200);
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+
+        .task-resources strong {
+            color: var(--gray-600);
+        }
+
+        .task-tag {
+            padding: 0.125rem 0.5rem;
+            border-radius: 1rem;
+            font-size: 0.625rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .task-tag.critical {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .task-tag.website {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .task-tag.content {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .task-tag.social {
+            background: #fdf4ff;
+            color: #9333ea;
+        }
+
+        /* Key Dates */
+        .key-dates {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .key-dates h3 {
+            margin-bottom: 1rem;
+            color: var(--gray-800);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .date-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+        }
+
+        .date-card {
+            text-align: center;
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .date-card:hover {
+            background: var(--gray-100);
+        }
+
+        .date-card.critical {
+            background: #fef2f2;
+            border: 2px solid #fecaca;
+        }
+
+        .date-card.complete-date {
+            background: #f0fdf4;
+            border: 2px solid #bbf7d0;
+        }
+
+        .date-day {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--gray-800);
+            line-height: 1;
+        }
+
+        .date-card.critical .date-day {
+            color: var(--danger);
+        }
+
+        .date-card.complete-date .date-day {
+            color: var(--success);
+        }
+
+        .date-month {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .date-title {
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .date-desc {
+            font-size: 0.7rem;
+            color: var(--gray-500);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray-500);
+            font-size: 0.875rem;
+        }
+
+        .footer-logo {
+            height: 30px;
+            opacity: 0.5;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .phases-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .date-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .top-bar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .date-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .timeline {
+                display: none;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+
+            .top-bar {
+                position: relative;
+                background: white;
+                color: black;
+            }
+
+            .action-btn {
+                display: none;
+            }
+
+            .phase-card {
+                break-inside: avoid;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .phase-card {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .phase-card:nth-child(1) { animation-delay: 0.1s; }
+        .phase-card:nth-child(2) { animation-delay: 0.2s; }
+        .phase-card:nth-child(3) { animation-delay: 0.3s; }
+        .phase-card:nth-child(4) { animation-delay: 0.4s; }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            animation: confettiFall 3s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Password Screen */
+        .password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0077B6 0%, #00B4D8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .password-overlay.hidden {
+            display: none;
+        }
+
+        .password-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .password-box h1 {
+            font-size: 1.5rem;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+
+        .password-box .subtitle {
+            color: var(--gray-500);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .password-box input {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .password-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .password-box input.error {
+            border-color: var(--danger);
+            animation: shake 0.5s ease;
+        }
+
+        .password-box button {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .password-box button:hover {
+            background: var(--primary-dark);
+        }
+
+        .password-box .error-msg {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .password-box .error-msg.show {
+            display: block;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .main-content.locked {
+            filter: blur(10px);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Password Protection Screen -->
+    <div class="password-overlay" id="passwordOverlay">
+        <div class="password-box">
+            <h1>🔒 Protected Content</h1>
+            <p class="subtitle">Enter password to access the dashboard</p>
+            <input type="password" id="passwordInput" placeholder="Enter password..." autocomplete="off">
+            <button id="passwordSubmit">Access Dashboard</button>
+            <p class="error-msg" id="errorMsg">Incorrect password. Try again.</p>
+        </div>
+    </div>
+
+    <!-- Top Navigation Bar -->
+    <nav class="top-bar">
+        <div class="logo-container">
+            <!-- The Bottom Feeder Logo (CSS-based for consistent rendering) -->
+            <div class="logo-text">
+                <span class="logo-the">The</span>
+                <span class="logo-main">B<span class="logo-target"></span>ttom Feeder</span>
+                <span class="logo-tagline">"It sucks to clean pools!"®</span>
+            </div>
+            <div class="logo-divider"></div>
+            <div class="plan-title">
+                <span class="plan-title-main">Implementation Plan</span>
+                <span class="plan-title-sub">Content Strategy 2025</span>
+            </div>
+        </div>
+        <div class="deadline-badge">
+            <span class="pulse"></span>
+            <span>Deadline: January 15, 2026</span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-card highlight">
+                <div class="stat-icon">📊</div>
+                <div class="stat-value" id="overall-percent">0%</div>
+                <div class="stat-label">Overall Progress</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-value" id="completed-count">0</div>
+                <div class="stat-label">Tasks Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📋</div>
+                <div class="stat-value" id="remaining-count">31</div>
+                <div class="stat-label">Tasks Remaining</div>
+            </div>
+            <div class="stat-card danger" id="days-card">
+                <div class="stat-icon">⏰</div>
+                <div class="stat-value" id="days-remaining">24</div>
+                <div class="stat-label">Days Until Deadline</div>
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <section class="progress-section">
+            <div class="progress-header">
+                <h2>📈 Project Timeline</h2>
+                <div class="quick-actions">
+                    <button class="action-btn primary" onclick="exportProgress()">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                        Export
+                    </button>
+                    <button class="action-btn secondary" onclick="resetProgress()">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>
+                        Reset
+                    </button>
+                    <button class="action-btn secondary" onclick="window.print()">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                        Print
+                    </button>
+                </div>
+            </div>
+
+            <div class="progress-bar-container">
+                <div class="progress-bar empty" id="main-progress" style="width: 3%">0%</div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="timeline">
+                <div class="timeline-progress" id="timeline-progress" style="width: 0%"></div>
+                <div class="timeline-point">
+                    <div class="timeline-dot current" id="dot-1">1</div>
+                    <div class="timeline-label">Kickoff</div>
+                    <div class="timeline-date">Dec 22</div>
+                </div>
+                <div class="timeline-point">
+                    <div class="timeline-dot" id="dot-2">2</div>
+                    <div class="timeline-label">Website v2</div>
+                    <div class="timeline-date">Jan 3</div>
+                </div>
+                <div class="timeline-point">
+                    <div class="timeline-dot" id="dot-3">3</div>
+                    <div class="timeline-label">Content Ready</div>
+                    <div class="timeline-date">Jan 8</div>
+                </div>
+                <div class="timeline-point">
+                    <div class="timeline-dot" id="dot-4">4</div>
+                    <div class="timeline-label">Go Live</div>
+                    <div class="timeline-date">Jan 9</div>
+                </div>
+                <div class="timeline-point">
+                    <div class="timeline-dot" id="dot-5">✓</div>
+                    <div class="timeline-label">Complete</div>
+                    <div class="timeline-date">Jan 15</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase Grid (2x2) -->
+        <div class="phases-grid">
+            <!-- Phase 1 -->
+            <div class="phase-card phase-1 current" id="phase-1">
+                <div class="phase-header">
+                    <div class="phase-info">
+                        <div class="phase-number">Phase 1 — Current</div>
+                        <div class="phase-title">Foundation & Website v2</div>
+                        <div class="phase-dates">Dec 22 – Jan 3 (12 days)</div>
+                    </div>
+                    <div class="phase-progress-circle">
+                        <svg width="60" height="60" viewBox="0 0 60 60">
+                            <circle class="bg" cx="30" cy="30" r="24"/>
+                            <circle class="progress" cx="30" cy="30" r="24"
+                                stroke-dasharray="150.8"
+                                stroke-dashoffset="150.8"
+                                id="phase-1-circle"/>
+                        </svg>
+                        <span class="phase-progress-text" id="phase-1-progress">0%</span>
+                    </div>
+                </div>
+                <div class="phase-body">
+                    <div class="phase-goal">
+                        <div class="phase-goal-label">Phase Goal</div>
+                        <div class="phase-goal-text">Launch website v2 and establish content infrastructure</div>
+                    </div>
+
+                    <div class="milestone">
+                        <span class="milestone-icon">🎯</span>
+                        <div class="milestone-text">
+                            <div class="milestone-title">CRITICAL: Website v2 Launch</div>
+                            <div class="milestone-date">Due: January 3, 2026</div>
+                        </div>
+                    </div>
+
+                    <ul class="task-list" data-phase="1">
+                        <li class="task-item" data-task="1-1">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Finalize website v2 design and copy</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag website">Website</span>
+                                    <span class="task-tag critical">Critical</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Review current site at thebottomfeeder.vercel.app</li>
+                                        <li>Compare to competitor sites (Dolphin, Beatbot, Aiper)</li>
+                                        <li>Update hero section with "No hoses. No cords. No hassle."</li>
+                                        <li>Ensure mobile responsiveness on all pages</li>
+                                        <li>Verify all product photos are high-res (min 1200px wide)</li>
+                                        <li>Review all copy against brand voice guidelines</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> brand-voice.md for messaging guidelines
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="1-2">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Implement product page updates</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag website">Website</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Add detailed specs: 18 lbs, 1.5-hr runtime, 3" min depth</li>
+                                        <li>Include before/after cleaning gallery (5+ images)</li>
+                                        <li>Add FAQ section addressing common objections</li>
+                                        <li>Highlight 4.9★ rating prominently</li>
+                                        <li>Add "US-based support" trust badge</li>
+                                        <li>Include video demo embed if available</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> CLAUDE.md "Common Objections to Address" section
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="1-3">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Add competitor comparison section</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag website">Website</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Create comparison table vs Dolphin, Polaris, Beatbot, Aiper</li>
+                                        <li>Include columns: Price, Weight, Runtime, App Required, Support</li>
+                                        <li>Highlight our differentiators: US support, no app, 4.9★ rating</li>
+                                        <li>Add "Why Choose Us" callout box</li>
+                                        <li>Keep tone factual, not disparaging of competitors</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> competitor-analysis.md for competitor data
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="1-4">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Set up Hootsuite account & connect platforms</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag social">Social</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Go to hootsuite.com and create business account</li>
+                                        <li>Connect platforms: Instagram, TikTok, Facebook, Twitter/X</li>
+                                        <li>Set up publishing calendar view</li>
+                                        <li>Create labels: educational, social-proof, product, community, promotional</li>
+                                        <li>Set up team member access if applicable</li>
+                                        <li>Configure notification preferences</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> content-calendar-template.md "Hootsuite Labels" section
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="1-5">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Create content asset library (photos, videos, logos)</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag content">Content</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Collect all product photos (minimum 20 high-res images)</li>
+                                        <li>Gather customer testimonial videos</li>
+                                        <li>Download logo files in all formats (PNG, SVG, transparent)</li>
+                                        <li>Create branded templates for social posts</li>
+                                        <li>Organize in folders: Photos, Videos, Logos, Templates</li>
+                                        <li>Use cloud storage (Google Drive/Dropbox) for team access</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> Brand colors: #0077B6 (primary), #00B4D8 (accent)
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="1-6">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Set up email marketing platform</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag content">Content</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Choose platform: Klaviyo (recommended), Mailchimp, or ConvertKit</li>
+                                        <li>Create account and connect to Shopify store</li>
+                                        <li>Create segments: Prospects, New Customers, Loyal, Inactive</li>
+                                        <li>Design email template with brand colors (#0077B6, #00B4D8)</li>
+                                        <li>Set up signup form for website</li>
+                                        <li>Configure sender domain for deliverability</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> platform-specs.md "Email Marketing" section
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="1-7">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Deploy website v2 to production</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag website">Website</span>
+                                    <span class="task-tag critical">Critical</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Run final QA checklist on staging</li>
+                                        <li>Test all links, forms, and checkout flow</li>
+                                        <li>Verify Shopify integration works correctly</li>
+                                        <li>Deploy to production via Vercel dashboard</li>
+                                        <li>Test purchase flow end-to-end with test order</li>
+                                        <li>Monitor for errors in first 24 hours</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> Vercel dashboard, Shopify admin
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="1-8">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">QA and test all website functionality</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag website">Website</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Test on browsers: Chrome, Safari, Firefox, Edge</li>
+                                        <li>Test on devices: Desktop, Tablet, Mobile</li>
+                                        <li>Verify: Cart, Checkout, Contact forms work</li>
+                                        <li>Check page load speed (target under 3 seconds)</li>
+                                        <li>Fix any broken links or images</li>
+                                        <li>Test on slow connection (3G simulation)</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> Chrome DevTools for testing, PageSpeed Insights
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Phase 2 -->
+            <div class="phase-card phase-2" id="phase-2">
+                <div class="phase-header">
+                    <div class="phase-info">
+                        <div class="phase-number">Phase 2</div>
+                        <div class="phase-title">Content Creation</div>
+                        <div class="phase-dates">Jan 4 – Jan 8 (5 days)</div>
+                    </div>
+                    <div class="phase-progress-circle">
+                        <svg width="60" height="60" viewBox="0 0 60 60">
+                            <circle class="bg" cx="30" cy="30" r="24"/>
+                            <circle class="progress" cx="30" cy="30" r="24"
+                                stroke-dasharray="150.8"
+                                stroke-dashoffset="150.8"
+                                id="phase-2-circle"/>
+                        </svg>
+                        <span class="phase-progress-text" id="phase-2-progress">0%</span>
+                    </div>
+                </div>
+                <div class="phase-body">
+                    <div class="phase-goal">
+                        <div class="phase-goal-label">Phase Goal</div>
+                        <div class="phase-goal-text">Build 2-week content backlog for all platforms</div>
+                    </div>
+
+                    <ul class="task-list" data-phase="2">
+                        <li class="task-item" data-task="2-1">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Create 14 Instagram posts (7 Reels, 4 Carousels, 3 Static)</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag social">Social</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li><strong>7 Reels:</strong> Before/after cleans, product demos, quick tips (1080x1920)</li>
+                                        <li><strong>4 Carousels:</strong> Educational content, competitor comparisons (1080x1350)</li>
+                                        <li><strong>3 Static:</strong> Customer quotes, product features, lifestyle shots</li>
+                                        <li>Use hooks in first 1-3 seconds (questions, bold statements)</li>
+                                        <li>Include 10-15 hashtags: #PoolCleaning #CordlessPoolVacuum #TheBottomFeeder</li>
+                                        <li>Write captions with CTA at end (link in bio, comment below, etc.)</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> platform-specs.md, brand-voice.md for tone guidelines
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="2-2">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Create 14 TikTok videos (repurpose + originals)</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag social">Social</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Repurpose 7 Instagram Reels with TikTok-native text overlays</li>
+                                        <li>Create 7 originals: POV content, trending sounds, ASMR cleaning</li>
+                                        <li>Specs: 1080x1920, 10-60 seconds optimal</li>
+                                        <li>Use trending sounds from TikTok Creative Center</li>
+                                        <li>Hashtags: #PoolTok #CleanTok #Satisfying #PoolCleaning</li>
+                                        <li>Hook viewers in first 1-2 seconds or they'll scroll</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> platform-specs.md "TikTok" section, TikTok Creative Center
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="2-3">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Create 8 Facebook posts (educational + community)</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag social">Social</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li><strong>4 Educational:</strong> Pool care tips, maintenance how-tos, common mistakes</li>
+                                        <li><strong>4 Community:</strong> Customer stories, Q&A prompts, engagement posts</li>
+                                        <li>Longer captions perform well on FB (200-500 words okay)</li>
+                                        <li>End posts with questions to drive comments</li>
+                                        <li>Image size: 1200x630 or 1200x1200</li>
+                                        <li>Consider creating a "Bottom Feeder Owners" group</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> platform-specs.md "Facebook" section
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="2-4">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Write 2 SEO-optimized blog posts</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag content">Content</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li><strong>Post 1:</strong> "Best Cordless Pool Vacuums 2025" (comparison article)</li>
+                                        <li><strong>Post 2:</strong> "How to Clean Your Pool in Half the Time"</li>
+                                        <li>Target keywords: "cordless pool vacuum", "pool robot review"</li>
+                                        <li>Length: 1500-2000 words each with H2/H3 structure</li>
+                                        <li>Include internal links to product pages</li>
+                                        <li>Add meta description (150-160 chars) and alt text for images</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> CLAUDE.md "Blog/SEO" section for keywords
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="2-5">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Create email welcome sequence (5 emails)</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag content">Content</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li><strong>Email 1 (Day 0):</strong> Welcome + brand story, what to expect</li>
+                                        <li><strong>Email 2 (Day 2):</strong> Product benefits + social proof (reviews)</li>
+                                        <li><strong>Email 3 (Day 4):</strong> How-to guide + pool care tips</li>
+                                        <li><strong>Email 4 (Day 6):</strong> Customer testimonials + success stories</li>
+                                        <li><strong>Email 5 (Day 8):</strong> Soft offer + CTA to purchase</li>
+                                        <li>Subject lines: 40-60 chars, use curiosity or questions</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> brand-voice.md for tone, platform-specs.md for email specs
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="2-6">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Plan 1 YouTube tutorial video</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag content">Content</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li><strong>Topic:</strong> "Complete Guide to The Bottom Feeder"</li>
+                                        <li><strong>Structure:</strong> Unbox → Setup → Demo → Tips → FAQ</li>
+                                        <li><strong>Length:</strong> 8-12 minutes for optimal watch time</li>
+                                        <li>Create thumbnail: Bright colors, face showing emotion, 3-5 words text</li>
+                                        <li>Write detailed description with timestamps</li>
+                                        <li>Include end screen and cards linking to product</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> platform-specs.md "YouTube" section for specs
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="2-7">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Create before/after content (5+ transformations)</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag content">Content</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Film 5 real pool cleanings from start to finish</li>
+                                        <li>Capture 3 angles: Before (dirty), During (action), After (crystal clear)</li>
+                                        <li>Include time elapsed counter/timestamp</li>
+                                        <li>Shoot in good lighting (morning or late afternoon)</li>
+                                        <li>Works for: Instagram Reels, TikTok, YouTube Shorts</li>
+                                        <li>Save raw footage for future edits and repurposing</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> This is your highest-engagement content type!
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="2-8">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Draft testimonial graphics (customer quotes)</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag social">Social</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Collect 5-10 best customer reviews from Shopify/Google/Facebook</li>
+                                        <li>Create branded quote graphics using Canva or similar</li>
+                                        <li>Include customer first name and location (with permission)</li>
+                                        <li>Use brand colors: #0077B6 background, white text</li>
+                                        <li>Specs: 1080x1080 (square) or 1080x1350 (portrait)</li>
+                                        <li>Add subtle Bottom Feeder logo watermark</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> Canva.com for templates, brand-voice.md for formatting
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Phase 3 -->
+            <div class="phase-card phase-3" id="phase-3">
+                <div class="phase-header">
+                    <div class="phase-info">
+                        <div class="phase-number">Phase 3</div>
+                        <div class="phase-title">Launch & Activation</div>
+                        <div class="phase-dates">Jan 9 – Jan 12 (4 days)</div>
+                    </div>
+                    <div class="phase-progress-circle">
+                        <svg width="60" height="60" viewBox="0 0 60 60">
+                            <circle class="bg" cx="30" cy="30" r="24"/>
+                            <circle class="progress" cx="30" cy="30" r="24"
+                                stroke-dasharray="150.8"
+                                stroke-dashoffset="150.8"
+                                id="phase-3-circle"/>
+                        </svg>
+                        <span class="phase-progress-text" id="phase-3-progress">0%</span>
+                    </div>
+                </div>
+                <div class="phase-body">
+                    <div class="phase-goal">
+                        <div class="phase-goal-label">Phase Goal</div>
+                        <div class="phase-goal-text">Go live on all platforms with consistent posting</div>
+                    </div>
+
+                    <ul class="task-list" data-phase="3">
+                        <li class="task-item" data-task="3-1">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Schedule Week 1 content in Hootsuite</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag social">Social</span>
+                                    <span class="task-tag critical">Critical</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Open content-calendar-template.md weekly grid for reference</li>
+                                        <li>Upload all Week 1 content to Hootsuite media library</li>
+                                        <li>Schedule Mon-Fri posts for Instagram, TikTok, Facebook</li>
+                                        <li>Set optimal times: IG 11am-1pm EST, TikTok 7-9am or 7-11pm EST</li>
+                                        <li>Add all captions and hashtags to each post</li>
+                                        <li>Double-check all posts are scheduled correctly before publishing</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> content-calendar-template.md for weekly grid
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="3-2">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Schedule Week 2 content in Hootsuite</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag social">Social</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Same process as Week 1 scheduling</li>
+                                        <li>Vary content types to avoid repetition</li>
+                                        <li>Cross-promote content across platforms</li>
+                                        <li>Schedule repurposed content (IG Reels → TikTok)</li>
+                                        <li>Leave room for reactive/trending content</li>
+                                        <li>Set calendar reminders to review scheduled posts</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> content-calendar-template.md for scheduling workflow
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="3-3">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Publish first 2 blog posts</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag content">Content</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Upload blog posts to website CMS</li>
+                                        <li>Add meta descriptions (150-160 characters)</li>
+                                        <li>Include internal links to product pages</li>
+                                        <li>Add featured images (1200x630)</li>
+                                        <li>Share links on social media after publishing</li>
+                                        <li>Submit URLs to Google Search Console for indexing</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> platform-specs.md "Blog/Website" section
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="3-4">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Activate email welcome sequence</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag content">Content</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Send test emails to yourself first (all 5 in sequence)</li>
+                                        <li>Verify all links, images, and formatting work</li>
+                                        <li>Check mobile rendering for each email</li>
+                                        <li>Enable automation trigger on new subscriber signup</li>
+                                        <li>Set up email delivery monitoring</li>
+                                        <li>Monitor first 48 hours for any issues</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> Email platform analytics dashboard
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="3-5">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Launch "New Year, Clean Pool" campaign</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag social">Social</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Theme: Fresh start, clean pool for 2026</li>
+                                        <li>Create campaign-specific hashtag: #NewYearCleanPool</li>
+                                        <li>Run across all platforms simultaneously</li>
+                                        <li>Consider limited-time promotional offer (10% off?)</li>
+                                        <li>Create 3-5 themed posts with consistent visual style</li>
+                                        <li>Boost top-performing posts if budget allows</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> CLAUDE.md "Seasonal Content Calendar" section
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="3-6">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Set up social monitoring (brand mentions)</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag social">Social</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>In Hootsuite: Create brand mention streams</li>
+                                        <li>Monitor: @thebottomfeeder, #thebottomfeeder, "bottom feeder pool"</li>
+                                        <li>Set up alerts for competitor brand mentions</li>
+                                        <li>Create response templates for common questions</li>
+                                        <li>Set up Google Alerts for brand name</li>
+                                        <li>Monitor Trouble Free Pool forum for mentions</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> Hootsuite streams, Google Alerts
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="3-7">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Begin daily engagement routine</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag social">Social</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li><strong>Morning (15 min):</strong> Check notifications, respond to comments/DMs</li>
+                                        <li><strong>Afternoon (10 min):</strong> Like/comment on related pool content</li>
+                                        <li><strong>Evening (5 min):</strong> Share UGC to stories, respond to new comments</li>
+                                        <li>Target: Minimum 30 minutes/day on engagement</li>
+                                        <li>Reply to every comment within 24 hours</li>
+                                        <li>Follow relevant accounts: pool owners, pool pros, lifestyle</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> CLAUDE.md "Daily Tasks" checklist
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Phase 4 -->
+            <div class="phase-card phase-4" id="phase-4">
+                <div class="phase-header">
+                    <div class="phase-info">
+                        <div class="phase-number">Phase 4</div>
+                        <div class="phase-title">Optimize & Scale</div>
+                        <div class="phase-dates">Jan 13 – Jan 15 (3 days)</div>
+                    </div>
+                    <div class="phase-progress-circle">
+                        <svg width="60" height="60" viewBox="0 0 60 60">
+                            <circle class="bg" cx="30" cy="30" r="24"/>
+                            <circle class="progress" cx="30" cy="30" r="24"
+                                stroke-dasharray="150.8"
+                                stroke-dashoffset="150.8"
+                                id="phase-4-circle"/>
+                        </svg>
+                        <span class="phase-progress-text" id="phase-4-progress">0%</span>
+                    </div>
+                </div>
+                <div class="phase-body">
+                    <div class="phase-goal">
+                        <div class="phase-goal-label">Phase Goal</div>
+                        <div class="phase-goal-text">Analyze early results and refine strategy for February</div>
+                    </div>
+
+                    <ul class="task-list" data-phase="4">
+                        <li class="task-item" data-task="4-1">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Review Week 1 analytics (all platforms)</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag content">Content</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li><strong>Instagram:</strong> Check Reach, Engagement rate, Saves, Shares</li>
+                                        <li><strong>TikTok:</strong> Views, Completion rate, Shares, Profile visits</li>
+                                        <li><strong>Facebook:</strong> Reach, Engagement, Link clicks</li>
+                                        <li><strong>Email:</strong> Open rate (target 20%+), Click rate (target 3%+)</li>
+                                        <li>Export reports from each platform to spreadsheet</li>
+                                        <li>Note any posts that significantly over/under performed</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> Each platform's native analytics dashboard
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="4-2">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Identify top-performing content types</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag content">Content</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Compare engagement rates across content types (Reels vs Static vs Carousels)</li>
+                                        <li>Identify which hooks got the most views in first 3 seconds</li>
+                                        <li>Note which posting times got best engagement</li>
+                                        <li>Analyze hashtag performance (which drove discovery?)</li>
+                                        <li>Document patterns: What topics, formats, tones worked best?</li>
+                                        <li>Create "Winners" list for content to repeat/remix</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> Your Week 1 analytics export
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="4-3">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Adjust posting times based on data</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag social">Social</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Check Instagram Insights → "When Your Followers Are Online"</li>
+                                        <li>Check TikTok analytics for peak activity hours</li>
+                                        <li>Compare your posting times vs actual engagement peaks</li>
+                                        <li>Update Hootsuite schedule to match optimal times</li>
+                                        <li>Test new times for 1 week, then compare results</li>
+                                        <li>Consider time zones of your target audience</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> Platform insights, Hootsuite scheduler
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="4-4">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Create Week 3-4 content based on learnings</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag content">Content</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Double down on content types that performed well</li>
+                                        <li>Stop or modify formats that underperformed</li>
+                                        <li>Recreate successful posts with variations</li>
+                                        <li>Batch create 14 more posts per platform</li>
+                                        <li>Schedule in Hootsuite for Weeks 3-4</li>
+                                        <li>Leave gaps for reactive/trending content</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> Your "Winners" list from task 4-2
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="4-5">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Document winning content formulas</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag content">Content</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Create a "Content Playbook" document</li>
+                                        <li><strong>Hooks that work:</strong> List your best opening lines/visuals</li>
+                                        <li><strong>Captions:</strong> Save high-performing caption formats</li>
+                                        <li><strong>Hashtags:</strong> Document best hashtag combinations</li>
+                                        <li><strong>CTAs:</strong> Note which calls-to-action drove action</li>
+                                        <li>Include screenshots of top posts for reference</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> Google Docs or Notion for playbook
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="4-6">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Set up UGC collection process</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag social">Social</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Create branded hashtag: #MyBottomFeeder or #BottomFeederClean</li>
+                                        <li>Add "Tag us @thebottomfeeder for a feature!" to bio</li>
+                                        <li>Send UGC request email to recent customers</li>
+                                        <li>Create simple permission/release form (can use Google Forms)</li>
+                                        <li>Set up folder to save approved UGC</li>
+                                        <li>Plan to feature 1-2 UGC posts per week</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> CLAUDE.md "Community" content pillar
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="4-7">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Create monthly reporting template</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag content">Content</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Create spreadsheet with sections for each platform</li>
+                                        <li><strong>Track:</strong> Followers, Engagement rate, Reach, Impressions</li>
+                                        <li><strong>Track:</strong> Website traffic from social, Email signups, Conversions</li>
+                                        <li>Include month-over-month comparison columns</li>
+                                        <li>Add section for "Top 3 Posts" and "Bottom 3 Posts"</li>
+                                        <li>Include "Learnings" and "Next Month Goals" sections</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> Google Sheets or Notion template
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="task-item" data-task="4-8">
+                            <div class="task-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-header">
+                                    <div class="task-title">Plan February content calendar</div>
+                                    <span class="dropdown-arrow">▶</span>
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag content">Content</span>
+                                </div>
+                                <div class="task-instructions">
+                                    <h4>How to Complete:</h4>
+                                    <ol>
+                                        <li>Review seasonal calendar in CLAUDE.md (February = "Planning Season")</li>
+                                        <li>Theme ideas: Valentine's pool party, Presidents Day sale</li>
+                                        <li>Pre-plan 4 weeks of content themes</li>
+                                        <li>Map out key dates: Feb 14 (Valentine's), Feb 17 (Presidents Day)</li>
+                                        <li>Apply learnings from January to February plan</li>
+                                        <li>Schedule content creation time for first week of Feb</li>
+                                    </ol>
+                                    <div class="task-resources">
+                                        <strong>📚 Resources:</strong> content-calendar-template.md monthly template
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Dates -->
+        <section class="key-dates">
+            <h3>🗓️ Key Milestones</h3>
+            <div class="date-grid">
+                <div class="date-card">
+                    <div class="date-day">22</div>
+                    <div class="date-month">December</div>
+                    <div class="date-title">Project Kickoff</div>
+                    <div class="date-desc">Begin Phase 1</div>
+                </div>
+                <div class="date-card critical">
+                    <div class="date-day">3</div>
+                    <div class="date-month">January</div>
+                    <div class="date-title">Website v2 Launch</div>
+                    <div class="date-desc">Critical deadline!</div>
+                </div>
+                <div class="date-card">
+                    <div class="date-day">8</div>
+                    <div class="date-month">January</div>
+                    <div class="date-title">Content Ready</div>
+                    <div class="date-desc">2-week backlog done</div>
+                </div>
+                <div class="date-card">
+                    <div class="date-day">9</div>
+                    <div class="date-month">January</div>
+                    <div class="date-title">Social Go-Live</div>
+                    <div class="date-desc">Start posting</div>
+                </div>
+                <div class="date-card complete-date">
+                    <div class="date-day">15</div>
+                    <div class="date-month">January</div>
+                    <div class="date-title">Complete!</div>
+                    <div class="date-desc">All systems go</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-brand">
+                <span style="font-weight: 900; font-style: italic; opacity: 0.6;">The Bottom Feeder</span>
+            </div>
+            <p>"No hoses. No cords. No hassle."</p>
+        </footer>
+    </div>
+
+    <!-- Confetti container -->
+    <div class="confetti" id="confetti"></div>
+
+    <script>
+        // Password Protection
+        const CORRECT_PASSWORD = 'lexiaonly';
+        const AUTH_KEY = 'tbf-dashboard-auth';
+
+        function checkAuth() {
+            const isAuthenticated = sessionStorage.getItem(AUTH_KEY) === 'true';
+            const overlay = document.getElementById('passwordOverlay');
+            if (isAuthenticated) {
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function handlePasswordSubmit() {
+            const input = document.getElementById('passwordInput');
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (input.value === CORRECT_PASSWORD) {
+                sessionStorage.setItem(AUTH_KEY, 'true');
+                document.getElementById('passwordOverlay').classList.add('hidden');
+                input.value = '';
+            } else {
+                input.classList.add('error');
+                errorMsg.classList.add('show');
+                setTimeout(() => {
+                    input.classList.remove('error');
+                }, 500);
+            }
+        }
+
+        // Password event listeners
+        document.getElementById('passwordSubmit').addEventListener('click', handlePasswordSubmit);
+        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handlePasswordSubmit();
+        });
+
+        // Check auth on load
+        checkAuth();
+
+        // Initialize from localStorage or set defaults
+        let taskState = JSON.parse(localStorage.getItem('tbf-tasks-v2')) || {};
+        let expandedState = JSON.parse(localStorage.getItem('tbf-expanded-v1')) || {};
+        const TOTAL_TASKS = 31;
+        // Use explicit date construction to avoid timezone issues
+        const DEADLINE = new Date(2026, 0, 15, 23, 59, 59); // Jan 15, 2026
+        const CIRCLE_CIRCUMFERENCE = 150.8;
+
+        // Initialize task click handlers
+        document.querySelectorAll('.task-item').forEach(task => {
+            const taskId = task.dataset.task;
+
+            // Restore completion state
+            if (taskState[taskId]) {
+                task.classList.add('completed');
+            }
+
+            // Restore expanded state
+            if (expandedState[taskId]) {
+                task.classList.add('expanded');
+            }
+
+            // Add click handler with area detection
+            task.addEventListener('click', (e) => {
+                // Check if clicked on checkbox area (toggle completion)
+                if (e.target.closest('.task-checkbox')) {
+                    task.classList.toggle('completed');
+                    taskState[taskId] = task.classList.contains('completed');
+                    localStorage.setItem('tbf-tasks-v2', JSON.stringify(taskState));
+                    updateProgress();
+                    checkMilestones();
+                }
+                // Check if clicked on header area (toggle dropdown)
+                else if (e.target.closest('.task-header')) {
+                    task.classList.toggle('expanded');
+                    expandedState[taskId] = task.classList.contains('expanded');
+                    localStorage.setItem('tbf-expanded-v1', JSON.stringify(expandedState));
+                }
+                // Clicking anywhere else on task-content (not inside instructions) also toggles dropdown
+                else if (e.target.closest('.task-content') && !e.target.closest('.task-instructions')) {
+                    task.classList.toggle('expanded');
+                    expandedState[taskId] = task.classList.contains('expanded');
+                    localStorage.setItem('tbf-expanded-v1', JSON.stringify(expandedState));
+                }
+            });
+        });
+
+        function updateProgress() {
+            const phases = [1, 2, 3, 4];
+            let totalCompleted = 0;
+            let totalTasks = 0;
+
+            phases.forEach(phase => {
+                const phaseTasks = document.querySelectorAll(`[data-phase="${phase}"] .task-item`);
+                const phaseCompleted = document.querySelectorAll(`[data-phase="${phase}"] .task-item.completed`);
+
+                const phasePercent = phaseTasks.length > 0
+                    ? Math.round((phaseCompleted.length / phaseTasks.length) * 100)
+                    : 0;
+
+                // Update text
+                document.getElementById(`phase-${phase}-progress`).textContent = phasePercent + '%';
+
+                // Update circle
+                const circle = document.getElementById(`phase-${phase}-circle`);
+                const offset = CIRCLE_CIRCUMFERENCE - (CIRCLE_CIRCUMFERENCE * phasePercent / 100);
+                circle.style.strokeDashoffset = offset;
+
+                totalCompleted += phaseCompleted.length;
+                totalTasks += phaseTasks.length;
+            });
+
+            // Update overall progress
+            const overallPercent = totalTasks > 0
+                ? Math.round((totalCompleted / totalTasks) * 100)
+                : 0;
+
+            const remaining = totalTasks - totalCompleted;
+
+            document.getElementById('overall-percent').textContent = overallPercent + '%';
+            document.getElementById('completed-count').textContent = totalCompleted;
+            document.getElementById('remaining-count').textContent = remaining;
+
+            const progressBar = document.getElementById('main-progress');
+            progressBar.style.width = Math.max(3, overallPercent) + '%';
+            progressBar.textContent = overallPercent + '%';
+            progressBar.classList.toggle('empty', overallPercent === 0);
+
+            // Update timeline progress
+            const timelineWidth = Math.min(100, overallPercent * 1.1); // Slight exaggeration for visual
+            document.getElementById('timeline-progress').style.width = timelineWidth + '%';
+
+            // Update timeline dots based on phase completion
+            const phase1Pct = parseInt(document.getElementById('phase-1-progress').textContent);
+            const phase2Pct = parseInt(document.getElementById('phase-2-progress').textContent);
+            const phase3Pct = parseInt(document.getElementById('phase-3-progress').textContent);
+            const phase4Pct = parseInt(document.getElementById('phase-4-progress').textContent);
+
+            updateDot('dot-1', phase1Pct > 0, phase1Pct === 100);
+            updateDot('dot-2', phase1Pct === 100, phase2Pct === 100);
+            updateDot('dot-3', phase2Pct === 100, phase3Pct === 100);
+            updateDot('dot-4', phase3Pct === 100, phase4Pct > 0);
+            updateDot('dot-5', phase4Pct === 100, phase4Pct === 100);
+
+            // Update days remaining
+            updateDaysRemaining();
+        }
+
+        function updateDot(id, active, complete) {
+            const dot = document.getElementById(id);
+            dot.classList.remove('active', 'complete', 'current');
+            if (complete) {
+                dot.classList.add('complete');
+            } else if (active) {
+                dot.classList.add('current');
+            }
+        }
+
+        function updateDaysRemaining() {
+            const now = new Date();
+            const diffTime = DEADLINE - now;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            const daysEl = document.getElementById('days-remaining');
+            const cardEl = document.getElementById('days-card');
+
+            daysEl.textContent = Math.max(0, diffDays);
+
+            // Color coding based on urgency
+            if (diffDays <= 3) {
+                cardEl.classList.add('danger');
+            } else if (diffDays <= 7) {
+                cardEl.style.background = '#fef3c7';
+            }
+        }
+
+        function checkMilestones() {
+            const completed = document.querySelectorAll('.task-item.completed').length;
+
+            // Celebrate phase completions
+            if (completed === 8) showConfetti(); // Phase 1 complete
+            if (completed === 16) showConfetti(); // Phase 2 complete
+            if (completed === 23) showConfetti(); // Phase 3 complete
+            if (completed === 31) showConfetti(); // All complete!
+        }
+
+        function showConfetti() {
+            const container = document.getElementById('confetti');
+            const colors = ['#0077B6', '#00B4D8', '#f59e0b', '#10b981', '#ef4444'];
+
+            for (let i = 0; i < 50; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+                piece.style.left = Math.random() * 100 + '%';
+                piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.animationDelay = Math.random() * 0.5 + 's';
+                piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                container.appendChild(piece);
+
+                setTimeout(() => piece.remove(), 3000);
+            }
+        }
+
+        function exportProgress() {
+            const data = {
+                exported: new Date().toISOString(),
+                project: 'The Bottom Feeder - Content Strategy',
+                tasks: taskState,
+                summary: {
+                    phase1: document.getElementById('phase-1-progress').textContent,
+                    phase2: document.getElementById('phase-2-progress').textContent,
+                    phase3: document.getElementById('phase-3-progress').textContent,
+                    phase4: document.getElementById('phase-4-progress').textContent,
+                    overall: document.getElementById('overall-percent').textContent,
+                    completed: document.getElementById('completed-count').textContent,
+                    remaining: document.getElementById('remaining-count').textContent,
+                    daysLeft: document.getElementById('days-remaining').textContent
+                }
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `tbf-progress-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function resetProgress() {
+            if (confirm('Are you sure you want to reset ALL progress? This cannot be undone.')) {
+                taskState = {};
+                localStorage.removeItem('tbf-tasks-v2');
+                document.querySelectorAll('.task-item').forEach(task => {
+                    task.classList.remove('completed');
+                });
+                updateProgress();
+            }
+        }
+
+        // Initialize
+        updateProgress();
+
+        // Update days remaining every minute
+        setInterval(updateDaysRemaining, 60000);
+    </script>
+</body>
+</html>
