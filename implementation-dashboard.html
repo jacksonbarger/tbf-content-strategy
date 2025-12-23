@@ -1041,6 +1041,186 @@
             filter: blur(10px);
             pointer-events: none;
         }
+
+        /* Add Task Button */
+        .add-task-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+            background: var(--gray-100);
+            border: 2px dashed var(--gray-300);
+            border-radius: 0.5rem;
+            color: var(--gray-500);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-task-btn:hover {
+            background: var(--gray-200);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Add Task Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.hidden {
+            display: none;
+        }
+
+        .modal-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-box h2 {
+            margin-bottom: 1.5rem;
+            color: var(--gray-800);
+        }
+
+        .modal-box input,
+        .modal-box select,
+        .modal-box textarea {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-box input:focus,
+        .modal-box select:focus,
+        .modal-box textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .modal-box label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--gray-700);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        /* Task Move Buttons */
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .task-actions button {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.7rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 0.25rem;
+            background: white;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .task-actions button:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .task-actions .delete-btn:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+
+        /* Notebook Section */
+        .notebook-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .notebook-section h3 {
+            margin-bottom: 1rem;
+            color: var(--gray-800);
+        }
+
+        .notebook-textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 1rem;
+            font-size: 1rem;
+            font-family: inherit;
+            border: 2px solid var(--gray-200);
+            border-radius: 0.5rem;
+            resize: vertical;
+        }
+
+        .notebook-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .notebook-status {
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--gray-500);
+        }
+
+        .notebook-status.saved {
+            color: var(--success);
+        }
+
+        /* Custom task styling */
+        .task-item.custom-task {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        }
     </style>
 </head>
 <body>
@@ -1052,6 +1232,33 @@
             <input type="password" id="passwordInput" placeholder="Enter password..." autocomplete="off">
             <button id="passwordSubmit">Access Dashboard</button>
             <p class="error-msg" id="errorMsg">Incorrect password. Try again.</p>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div class="modal-overlay hidden" id="addTaskModal">
+        <div class="modal-box">
+            <h2>➕ Add New Task</h2>
+            <input type="hidden" id="taskPhase" value="">
+            <label>Task Title</label>
+            <input type="text" id="taskTitle" placeholder="Enter task title...">
+            <label>Category</label>
+            <select id="taskCategory">
+                <option value="website">Website</option>
+                <option value="social">Social</option>
+                <option value="content">Content</option>
+                <option value="email">Email</option>
+                <option value="other">Other</option>
+            </select>
+            <label>Instructions (optional)</label>
+            <textarea id="taskInstructions" rows="4" placeholder="Step-by-step instructions..."></textarea>
+            <label>
+                <input type="checkbox" id="taskCritical"> Mark as Critical
+            </label>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeAddTaskModal()">Cancel</button>
+                <button class="btn-primary" onclick="addNewTask()">Add Task</button>
+            </div>
         </div>
     </div>
 
@@ -1418,6 +1625,7 @@
                             </div>
                         </li>
                     </ul>
+                    <button class="add-task-btn" onclick="openAddTaskModal(1)">➕ Add Task to Phase 1</button>
                 </div>
             </div>
 
@@ -1672,6 +1880,7 @@
                             </div>
                         </li>
                     </ul>
+                    <button class="add-task-btn" onclick="openAddTaskModal(2)">➕ Add Task to Phase 2</button>
                 </div>
             </div>
 
@@ -1899,6 +2108,7 @@
                             </div>
                         </li>
                     </ul>
+                    <button class="add-task-btn" onclick="openAddTaskModal(3)">➕ Add Task to Phase 3</button>
                 </div>
             </div>
 
@@ -2153,6 +2363,7 @@
                             </div>
                         </li>
                     </ul>
+                    <button class="add-task-btn" onclick="openAddTaskModal(4)">➕ Add Task to Phase 4</button>
                 </div>
             </div>
         </div>
@@ -2192,6 +2403,13 @@
                     <div class="date-desc">All systems go</div>
                 </div>
             </div>
+        </section>
+
+        <!-- Notebook Section -->
+        <section class="notebook-section">
+            <h3>📝 Notes & Ideas</h3>
+            <textarea class="notebook-textarea" id="notebookContent" placeholder="Jot down your ideas, notes, and thoughts here. Everything is saved automatically..."></textarea>
+            <div class="notebook-status" id="notebookStatus">Auto-saved to browser</div>
         </section>
 
         <!-- Footer -->
@@ -2444,6 +2662,183 @@
                 updateProgress();
             }
         }
+
+        // =========================================
+        // CUSTOM TASKS FUNCTIONALITY
+        // =========================================
+        let customTasks = JSON.parse(localStorage.getItem('tbf-custom-tasks')) || [];
+        let customTaskCounter = parseInt(localStorage.getItem('tbf-custom-task-counter')) || 0;
+
+        function openAddTaskModal(phase) {
+            document.getElementById('taskPhase').value = phase;
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskInstructions').value = '';
+            document.getElementById('taskCritical').checked = false;
+            document.getElementById('addTaskModal').classList.remove('hidden');
+        }
+
+        function closeAddTaskModal() {
+            document.getElementById('addTaskModal').classList.add('hidden');
+        }
+
+        function addNewTask() {
+            const phase = document.getElementById('taskPhase').value;
+            const title = document.getElementById('taskTitle').value.trim();
+            const category = document.getElementById('taskCategory').value;
+            const instructions = document.getElementById('taskInstructions').value.trim();
+            const isCritical = document.getElementById('taskCritical').checked;
+
+            if (!title) {
+                alert('Please enter a task title');
+                return;
+            }
+
+            customTaskCounter++;
+            const taskId = `custom-${customTaskCounter}`;
+
+            const newTask = {
+                id: taskId,
+                phase: parseInt(phase),
+                title: title,
+                category: category,
+                instructions: instructions,
+                critical: isCritical,
+                created: new Date().toISOString()
+            };
+
+            customTasks.push(newTask);
+            localStorage.setItem('tbf-custom-tasks', JSON.stringify(customTasks));
+            localStorage.setItem('tbf-custom-task-counter', customTaskCounter);
+
+            renderCustomTask(newTask);
+            closeAddTaskModal();
+            updateProgress();
+        }
+
+        function renderCustomTask(task) {
+            const taskList = document.querySelector(`[data-phase="${task.phase}"]`);
+            const li = document.createElement('li');
+            li.className = 'task-item custom-task';
+            li.dataset.task = task.id;
+
+            const instructionsHtml = task.instructions ? `
+                <div class="task-instructions">
+                    <h4>How to Complete:</h4>
+                    <p>${task.instructions.replace(/\n/g, '<br>')}</p>
+                </div>
+            ` : '';
+
+            li.innerHTML = `
+                <div class="task-checkbox">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="task-content">
+                    <div class="task-header">
+                        <div class="task-title">${task.title}</div>
+                        <span class="dropdown-arrow">${task.instructions ? '▶' : ''}</span>
+                    </div>
+                    <div class="task-meta">
+                        <span class="task-tag ${task.category}">${task.category.charAt(0).toUpperCase() + task.category.slice(1)}</span>
+                        ${task.critical ? '<span class="task-tag critical">Critical</span>' : ''}
+                    </div>
+                    ${instructionsHtml}
+                    <div class="task-actions">
+                        ${task.phase > 1 ? `<button onclick="moveTask('${task.id}', ${task.phase - 1})">◀ Phase ${task.phase - 1}</button>` : ''}
+                        ${task.phase < 4 ? `<button onclick="moveTask('${task.id}', ${task.phase + 1})">Phase ${task.phase + 1} ▶</button>` : ''}
+                        <button class="delete-btn" onclick="deleteTask('${task.id}')">🗑️ Delete</button>
+                    </div>
+                </div>
+            `;
+
+            // Restore completion state
+            if (taskState[task.id]) {
+                li.classList.add('completed');
+            }
+            if (expandedState[task.id]) {
+                li.classList.add('expanded');
+            }
+
+            // Add click handlers
+            li.addEventListener('click', (e) => {
+                if (e.target.closest('.task-checkbox')) {
+                    li.classList.toggle('completed');
+                    taskState[task.id] = li.classList.contains('completed');
+                    localStorage.setItem('tbf-tasks-v2', JSON.stringify(taskState));
+                    updateProgress();
+                    checkMilestones();
+                }
+                else if (e.target.closest('.task-header') && task.instructions) {
+                    li.classList.toggle('expanded');
+                    expandedState[task.id] = li.classList.contains('expanded');
+                    localStorage.setItem('tbf-expanded-v1', JSON.stringify(expandedState));
+                }
+                else if (e.target.closest('.task-content') && !e.target.closest('.task-instructions') && !e.target.closest('.task-actions') && task.instructions) {
+                    li.classList.toggle('expanded');
+                    expandedState[task.id] = li.classList.contains('expanded');
+                    localStorage.setItem('tbf-expanded-v1', JSON.stringify(expandedState));
+                }
+            });
+
+            taskList.appendChild(li);
+        }
+
+        function moveTask(taskId, newPhase) {
+            const taskIndex = customTasks.findIndex(t => t.id === taskId);
+            if (taskIndex === -1) return;
+
+            customTasks[taskIndex].phase = newPhase;
+            localStorage.setItem('tbf-custom-tasks', JSON.stringify(customTasks));
+
+            // Remove and re-render the task
+            const taskElement = document.querySelector(`[data-task="${taskId}"]`);
+            if (taskElement) taskElement.remove();
+            renderCustomTask(customTasks[taskIndex]);
+            updateProgress();
+        }
+
+        function deleteTask(taskId) {
+            if (!confirm('Delete this task?')) return;
+
+            customTasks = customTasks.filter(t => t.id !== taskId);
+            localStorage.setItem('tbf-custom-tasks', JSON.stringify(customTasks));
+
+            const taskElement = document.querySelector(`[data-task="${taskId}"]`);
+            if (taskElement) taskElement.remove();
+
+            // Clean up task state
+            delete taskState[taskId];
+            delete expandedState[taskId];
+            localStorage.setItem('tbf-tasks-v2', JSON.stringify(taskState));
+            localStorage.setItem('tbf-expanded-v1', JSON.stringify(expandedState));
+
+            updateProgress();
+        }
+
+        // Render existing custom tasks on load
+        customTasks.forEach(task => renderCustomTask(task));
+
+        // =========================================
+        // NOTEBOOK FUNCTIONALITY
+        // =========================================
+        const notebookContent = document.getElementById('notebookContent');
+        const notebookStatus = document.getElementById('notebookStatus');
+        let saveTimeout;
+
+        // Load saved notes
+        notebookContent.value = localStorage.getItem('tbf-notebook') || '';
+
+        // Auto-save with debounce
+        notebookContent.addEventListener('input', () => {
+            notebookStatus.textContent = 'Saving...';
+            notebookStatus.classList.remove('saved');
+
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                localStorage.setItem('tbf-notebook', notebookContent.value);
+                notebookStatus.textContent = '✓ Saved';
+                notebookStatus.classList.add('saved');
+            }, 500);
+        });
 
         // Initialize
         updateProgress();
