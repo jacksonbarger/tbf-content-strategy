@@ -1186,9 +1186,63 @@
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
 
-        .notebook-section h3 {
+        .notebook-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 1rem;
+        }
+
+        .notebook-section h3 {
             color: var(--gray-800);
+            margin: 0;
+        }
+
+        .expand-btn {
+            padding: 0.5rem 1rem;
+            background: var(--gray-100);
+            border: 1px solid var(--gray-300);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            transition: all 0.2s;
+        }
+
+        .expand-btn:hover {
+            background: var(--gray-200);
+        }
+
+        .notebook-tabs {
+            display: flex;
+            gap: 0.25rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-200);
+            overflow-x: auto;
+        }
+
+        .notebook-tab {
+            padding: 0.75rem 1.25rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--gray-500);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .notebook-tab:hover {
+            color: var(--gray-700);
+            background: var(--gray-50);
+        }
+
+        .notebook-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            font-weight: 600;
         }
 
         .notebook-textarea {
@@ -1200,6 +1254,11 @@
             border: 2px solid var(--gray-200);
             border-radius: 0.5rem;
             resize: vertical;
+            transition: min-height 0.3s ease;
+        }
+
+        .notebook-textarea.expanded {
+            min-height: 500px;
         }
 
         .notebook-textarea:focus {
@@ -1207,8 +1266,14 @@
             border-color: var(--primary);
         }
 
-        .notebook-status {
+        .notebook-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-top: 0.5rem;
+        }
+
+        .notebook-status {
             font-size: 0.85rem;
             color: var(--gray-500);
         }
@@ -2403,9 +2468,20 @@
 
         <!-- Notebook Section -->
         <section class="notebook-section">
-            <h3>📝 Notes & Ideas</h3>
-            <textarea class="notebook-textarea" id="notebookContent" placeholder="Jot down your ideas, notes, and thoughts here. Everything is saved automatically..."></textarea>
-            <div class="notebook-status" id="notebookStatus">Auto-saved to browser</div>
+            <div class="notebook-header">
+                <h3>📝 Notes & Ideas</h3>
+                <button class="expand-btn" id="expandBtn" onclick="toggleExpand()">⤢ Expand</button>
+            </div>
+            <div class="notebook-tabs">
+                <button class="notebook-tab active" data-tab="general" onclick="switchTab('general')">📝 General Notes</button>
+                <button class="notebook-tab" data-tab="ideas" onclick="switchTab('ideas')">💡 Content Ideas</button>
+                <button class="notebook-tab" data-tab="goals" onclick="switchTab('goals')">🎯 Goals & Priorities</button>
+                <button class="notebook-tab" data-tab="todo" onclick="switchTab('todo')">📋 To-Do / Reminders</button>
+            </div>
+            <textarea class="notebook-textarea" id="notebookContent" placeholder="Jot down your notes here. Everything is saved automatically..."></textarea>
+            <div class="notebook-footer">
+                <div class="notebook-status" id="notebookStatus">Auto-saved to browser</div>
+            </div>
         </section>
 
         <!-- Footer -->
@@ -2803,14 +2879,73 @@
         customTasks.forEach(task => renderCustomTask(task));
 
         // =========================================
-        // NOTEBOOK FUNCTIONALITY
+        // NOTEBOOK FUNCTIONALITY WITH TABS
         // =========================================
         const notebookContent = document.getElementById('notebookContent');
         const notebookStatus = document.getElementById('notebookStatus');
+        const expandBtn = document.getElementById('expandBtn');
         let saveTimeout;
+        let currentTab = 'general';
+        let isExpanded = localStorage.getItem('tbf-notebook-expanded') === 'true';
 
-        // Load saved notes
-        notebookContent.value = localStorage.getItem('tbf-notebook') || '';
+        // Tab placeholders
+        const tabPlaceholders = {
+            general: 'Jot down your general notes here...',
+            ideas: 'Brainstorm content ideas, video concepts, post topics...',
+            goals: 'Define your goals, priorities, and key objectives...',
+            todo: 'Track your to-dos, reminders, and action items...'
+        };
+
+        // Migrate old notebook data to new tab system
+        const oldNotebook = localStorage.getItem('tbf-notebook');
+        if (oldNotebook && !localStorage.getItem('tbf-notebook-general')) {
+            localStorage.setItem('tbf-notebook-general', oldNotebook);
+        }
+
+        // Load saved notes for current tab
+        function loadTabContent(tab) {
+            const content = localStorage.getItem(`tbf-notebook-${tab}`) || '';
+            notebookContent.value = content;
+            notebookContent.placeholder = tabPlaceholders[tab];
+        }
+
+        // Switch tab function
+        function switchTab(tab) {
+            // Save current tab content first
+            localStorage.setItem(`tbf-notebook-${currentTab}`, notebookContent.value);
+
+            // Update active tab styling
+            document.querySelectorAll('.notebook-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+
+            // Load new tab content
+            currentTab = tab;
+            localStorage.setItem('tbf-notebook-tab', tab);
+            loadTabContent(tab);
+
+            notebookStatus.textContent = 'Auto-saved to browser';
+            notebookStatus.classList.remove('saved');
+        }
+
+        // Toggle expand function
+        function toggleExpand() {
+            isExpanded = !isExpanded;
+            localStorage.setItem('tbf-notebook-expanded', isExpanded);
+            notebookContent.classList.toggle('expanded', isExpanded);
+            expandBtn.textContent = isExpanded ? '⤡ Collapse' : '⤢ Expand';
+        }
+
+        // Initialize tab from saved state
+        currentTab = localStorage.getItem('tbf-notebook-tab') || 'general';
+        document.querySelectorAll('.notebook-tab').forEach(t => t.classList.remove('active'));
+        document.querySelector(`[data-tab="${currentTab}"]`).classList.add('active');
+        loadTabContent(currentTab);
+
+        // Initialize expand state
+        if (isExpanded) {
+            notebookContent.classList.add('expanded');
+            expandBtn.textContent = '⤡ Collapse';
+        }
 
         // Auto-save with debounce
         notebookContent.addEventListener('input', () => {
@@ -2819,7 +2954,7 @@
 
             clearTimeout(saveTimeout);
             saveTimeout = setTimeout(() => {
-                localStorage.setItem('tbf-notebook', notebookContent.value);
+                localStorage.setItem(`tbf-notebook-${currentTab}`, notebookContent.value);
                 notebookStatus.textContent = '✓ Saved';
                 notebookStatus.classList.add('saved');
             }, 500);
