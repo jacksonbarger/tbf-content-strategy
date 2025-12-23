@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Bottom Feeder - Implementation Plan</title>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-
     <style>
         :root {
             --primary: #0077B6;
@@ -2884,31 +2880,7 @@
         customTasks.forEach(task => renderCustomTask(task));
 
         // =========================================
-        // FIREBASE CONFIGURATION
-        // =========================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyDEXAMPLE-REPLACE-WITH-YOUR-KEY",
-            authDomain: "tbf-content-strategy.firebaseapp.com",
-            databaseURL: "https://tbf-content-strategy-default-rtdb.firebaseio.com",
-            projectId: "tbf-content-strategy",
-            storageBucket: "tbf-content-strategy.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abc123"
-        };
-
-        // Initialize Firebase
-        let db = null;
-        let firebaseEnabled = false;
-        try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.database();
-            firebaseEnabled = true;
-        } catch (e) {
-            console.log('Firebase not configured, using localStorage fallback');
-        }
-
-        // =========================================
-        // NOTEBOOK FUNCTIONALITY WITH TABS
+        // NOTEBOOK FUNCTIONALITY WITH TABS (NEON DB)
         // =========================================
         const notebookContent = document.getElementById('notebookContent');
         const notebookStatus = document.getElementById('notebookStatus');
@@ -2917,6 +2889,7 @@
         let currentTab = 'general';
         let isExpanded = localStorage.getItem('tbf-notebook-expanded') === 'true';
         let notesData = {};
+        let dbAvailable = false;
 
         // Tab placeholders
         const tabPlaceholders = {
@@ -2926,21 +2899,29 @@
             todo: 'Track your to-dos, reminders, and action items... (shared)'
         };
 
-        // Load notes from Firebase or localStorage
-        function loadAllNotes() {
-            if (firebaseEnabled && db) {
-                db.ref('notes').on('value', (snapshot) => {
-                    notesData = snapshot.val() || {};
+        // Load notes from Neon API
+        async function loadAllNotes() {
+            try {
+                notebookStatus.textContent = 'Loading...';
+                const response = await fetch('/api/notes');
+                if (response.ok) {
+                    notesData = await response.json();
+                    dbAvailable = true;
                     loadTabContent(currentTab);
-                    notebookStatus.textContent = '☁️ Synced with cloud';
+                    notebookStatus.textContent = '☁️ Synced with database';
                     notebookStatus.classList.add('saved');
-                });
-            } else {
+                } else {
+                    throw new Error('API not available');
+                }
+            } catch (error) {
+                console.log('Database not available, using localStorage');
+                dbAvailable = false;
                 // Fallback to localStorage
                 ['general', 'ideas', 'goals', 'todo'].forEach(tab => {
                     notesData[tab] = localStorage.getItem(`tbf-notebook-${tab}`) || '';
                 });
                 loadTabContent(currentTab);
+                notebookStatus.textContent = '💾 Saved locally';
             }
         }
 
@@ -2950,23 +2931,30 @@
             notebookContent.placeholder = tabPlaceholders[tab];
         }
 
-        // Save notes to Firebase or localStorage
-        function saveNotes(tab, content) {
+        // Save notes to Neon API
+        async function saveNotes(tab, content) {
             notesData[tab] = content;
 
-            if (firebaseEnabled && db) {
-                db.ref(`notes/${tab}`).set(content)
-                    .then(() => {
-                        notebookStatus.textContent = '☁️ Saved to cloud';
-                        notebookStatus.classList.add('saved');
-                    })
-                    .catch((error) => {
-                        notebookStatus.textContent = '⚠️ Save failed';
-                        console.error('Firebase save error:', error);
+            if (dbAvailable) {
+                try {
+                    const response = await fetch('/api/notes', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tab, content })
                     });
+                    if (response.ok) {
+                        notebookStatus.textContent = '☁️ Saved to database';
+                        notebookStatus.classList.add('saved');
+                    } else {
+                        throw new Error('Save failed');
+                    }
+                } catch (error) {
+                    notebookStatus.textContent = '⚠️ Save failed, stored locally';
+                    localStorage.setItem(`tbf-notebook-${tab}`, content);
+                }
             } else {
                 localStorage.setItem(`tbf-notebook-${tab}`, content);
-                notebookStatus.textContent = '✓ Saved locally';
+                notebookStatus.textContent = '💾 Saved locally';
                 notebookStatus.classList.add('saved');
             }
         }
