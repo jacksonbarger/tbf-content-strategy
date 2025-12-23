@@ -1287,6 +1287,318 @@
         .task-item.custom-task {
             background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
         }
+
+        /* 3D Model Guide Section */
+        .guide-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .guide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.5rem;
+            margin: -0.5rem;
+            border-radius: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .guide-header:hover {
+            background: var(--gray-50);
+        }
+
+        .guide-header h3 {
+            color: var(--gray-800);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .guide-content {
+            display: none;
+            margin-top: 1.5rem;
+        }
+
+        .guide-content.expanded {
+            display: block;
+        }
+
+        .guide-tabs {
+            display: flex;
+            gap: 0.25rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .guide-tab {
+            padding: 0.75rem 1.25rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--gray-500);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .guide-tab:hover {
+            color: var(--gray-700);
+            background: var(--gray-50);
+        }
+
+        .guide-tab.active {
+            color: #d97706;
+            border-bottom-color: #d97706;
+            font-weight: 600;
+        }
+
+        .guide-panel {
+            display: none;
+        }
+
+        .guide-panel.active {
+            display: block;
+        }
+
+        /* Workflow Pipeline */
+        .workflow-pipeline {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .workflow-step {
+            background: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .workflow-arrow {
+            font-size: 1.25rem;
+            color: #92400e;
+            font-weight: bold;
+        }
+
+        /* Materials Table */
+        .materials-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .materials-table th {
+            background: var(--gray-100);
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .materials-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            vertical-align: middle;
+        }
+
+        .materials-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .materials-table tr:hover {
+            background: var(--gray-50);
+        }
+
+        .color-swatch {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin-right: 8px;
+            vertical-align: middle;
+            border: 1px solid var(--gray-300);
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem 1.25rem;
+            border-radius: 0.5rem;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .code-block code {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* Checklist */
+        .guide-checklist {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+        }
+
+        .guide-checklist li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--gray-700);
+        }
+
+        .guide-checklist li::before {
+            content: '☐';
+            font-size: 1.1rem;
+        }
+
+        /* Phase Cards in Guide */
+        .guide-phase {
+            background: var(--gray-50);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #d97706;
+        }
+
+        .guide-phase h4 {
+            margin: 0 0 0.75rem 0;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .guide-phase ol, .guide-phase ul {
+            margin: 0.5rem 0 0 1.5rem;
+            color: var(--gray-700);
+        }
+
+        .guide-phase li {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+
+        /* Troubleshooting Table */
+        .troubleshoot-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .troubleshoot-table th {
+            background: #fef3c7;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #fde68a;
+        }
+
+        .troubleshoot-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            vertical-align: top;
+        }
+
+        .troubleshoot-table tr:hover {
+            background: #fffbeb;
+        }
+
+        /* Collapsible sections in full guide */
+        .guide-accordion {
+            border: 1px solid var(--gray-200);
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+
+        .guide-accordion-header {
+            padding: 1rem 1.25rem;
+            background: var(--gray-50);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: var(--gray-800);
+            transition: background 0.2s;
+        }
+
+        .guide-accordion-header:hover {
+            background: var(--gray-100);
+        }
+
+        .guide-accordion-content {
+            display: none;
+            padding: 1.25rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .guide-accordion.open .guide-accordion-content {
+            display: block;
+        }
+
+        .guide-accordion-icon {
+            transition: transform 0.2s;
+        }
+
+        .guide-accordion.open .guide-accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Subsection headers */
+        .guide-subsection {
+            margin: 1.5rem 0 1rem;
+        }
+
+        .guide-subsection h5 {
+            color: var(--gray-700);
+            font-size: 0.95rem;
+            margin: 0 0 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Info boxes */
+        .guide-info {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            border-radius: 0 0.5rem 0.5rem 0;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .guide-warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            border-radius: 0 0.5rem 0.5rem 0;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -2485,6 +2797,556 @@
             </div>
         </section>
 
+        <!-- 3D Model Export Guide Section -->
+        <section class="guide-section">
+            <div class="guide-header" onclick="toggleGuide()">
+                <h3>🎨 3D Model Export Guide</h3>
+                <button class="expand-btn" id="guideExpandBtn">▼ Expand</button>
+            </div>
+
+            <div class="guide-content" id="guideContent">
+                <!-- Tab Navigation -->
+                <div class="guide-tabs">
+                    <button class="guide-tab active" data-guide="quick" onclick="switchGuideTab('quick')">⚡ Quick Summary</button>
+                    <button class="guide-tab" data-guide="full" onclick="switchGuideTab('full')">📖 Full Guide</button>
+                </div>
+
+                <!-- Quick Summary Tab -->
+                <div class="guide-panel active" id="guide-quick">
+                    <!-- Workflow Pipeline -->
+                    <div class="workflow-pipeline">
+                        <span class="workflow-step">📐 SolidWorks</span>
+                        <span class="workflow-arrow">→</span>
+                        <span class="workflow-step">.STEP file</span>
+                        <span class="workflow-arrow">→</span>
+                        <span class="workflow-step">🎨 Blender</span>
+                        <span class="workflow-arrow">→</span>
+                        <span class="workflow-step">.GLB file</span>
+                        <span class="workflow-arrow">→</span>
+                        <span class="workflow-step">🌐 model-viewer</span>
+                    </div>
+
+                    <!-- Quick Steps -->
+                    <div class="guide-phase">
+                        <h4>📐 Step 1: SolidWorks Export</h4>
+                        <ol>
+                            <li>File → Save As → <strong>STEP AP214</strong> (.step)</li>
+                            <li>Save as <code>bottom-feeder-assembly.step</code></li>
+                            <li>Document materials (they don't transfer!) - see table below</li>
+                            <li>Export logo as PNG (1024x1024, transparent background)</li>
+                        </ol>
+                    </div>
+
+                    <div class="guide-phase">
+                        <h4>🎨 Step 2: Blender Conversion</h4>
+                        <ol>
+                            <li>Install <a href="https://www.blender.org/download/" target="_blank">Blender</a> (free)</li>
+                            <li>File → Import → STEP (or convert via FreeCAD first)</li>
+                            <li>Apply materials using PBR values below</li>
+                            <li>File → Export → glTF 2.0 → <strong>glTF Binary (.glb)</strong></li>
+                            <li>Enable <strong>Compress</strong> (Draco compression)</li>
+                        </ol>
+                    </div>
+
+                    <div class="guide-phase">
+                        <h4>🌐 Step 3: Web Implementation</h4>
+                        <ol>
+                            <li>Place file: <code>/public/models/bottom-feeder.glb</code></li>
+                            <li>Test at <a href="https://gltf-viewer.donmccurdy.com/" target="_blank">gltf-viewer.donmccurdy.com</a></li>
+                            <li>Add model-viewer code (see Full Guide)</li>
+                        </ol>
+                    </div>
+
+                    <!-- Materials Reference Table -->
+                    <div class="guide-subsection">
+                        <h5>🎨 Materials Reference (PBR Values)</h5>
+                    </div>
+                    <table class="materials-table">
+                        <thead>
+                            <tr>
+                                <th>Part</th>
+                                <th>Material</th>
+                                <th>Color</th>
+                                <th>Metallic</th>
+                                <th>Roughness</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Handle/Base Plate</td>
+                                <td>Stainless Steel</td>
+                                <td><span class="color-swatch" style="background:#C0C0C0"></span>#C0C0C0</td>
+                                <td>1.0</td>
+                                <td>0.35</td>
+                            </tr>
+                            <tr>
+                                <td>Cables/Tubing</td>
+                                <td>Yellow Plastic</td>
+                                <td><span class="color-swatch" style="background:#FFD700"></span>#FFD700</td>
+                                <td>0.0</td>
+                                <td>0.50</td>
+                            </tr>
+                            <tr>
+                                <td>Housing</td>
+                                <td>Gray Plastic</td>
+                                <td><span class="color-swatch" style="background:#404040"></span>#404040</td>
+                                <td>0.0</td>
+                                <td>0.40</td>
+                            </tr>
+                            <tr>
+                                <td>Wheels/Seals</td>
+                                <td>Black Rubber</td>
+                                <td><span class="color-swatch" style="background:#1A1A1A"></span>#1A1A1A</td>
+                                <td>0.0</td>
+                                <td>0.85</td>
+                            </tr>
+                            <tr>
+                                <td>Logo</td>
+                                <td>Decal (Image)</td>
+                                <td colspan="3">Export as PNG 1024x1024</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Brand Colors -->
+                    <div class="guide-subsection">
+                        <h5>🎨 Brand Color Codes</h5>
+                    </div>
+                    <table class="materials-table">
+                        <thead>
+                            <tr>
+                                <th>Element</th>
+                                <th>Hex Code</th>
+                                <th>Preview</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>TBF Yellow</td>
+                                <td>#FFFF00</td>
+                                <td><span class="color-swatch" style="background:#FFFF00"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Stainless Steel</td>
+                                <td>#C0C0C0</td>
+                                <td><span class="color-swatch" style="background:#C0C0C0"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Body Gray</td>
+                                <td>#404040</td>
+                                <td><span class="color-swatch" style="background:#404040"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Brand Black</td>
+                                <td>#171717</td>
+                                <td><span class="color-swatch" style="background:#171717"></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Deliverables Checklist -->
+                    <div class="guide-subsection">
+                        <h5>✅ Deliverables Checklist</h5>
+                    </div>
+                    <ul class="guide-checklist">
+                        <li><code>bottom-feeder.glb</code> (under 5MB)</li>
+                        <li><code>tbf-logo.png</code> (1024x1024, transparent)</li>
+                        <li>Fallback image for non-WebGL browsers</li>
+                        <li>Tested on mobile (iOS Safari, Android Chrome)</li>
+                    </ul>
+
+                    <!-- Common Issues -->
+                    <div class="guide-subsection">
+                        <h5>⚠️ Common Issues & Fixes</h5>
+                    </div>
+                    <table class="troubleshoot-table">
+                        <thead>
+                            <tr>
+                                <th>Problem</th>
+                                <th>Solution</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Model appears black</td>
+                                <td>Set Metallic=1 for metals, use Principled BSDF shader</td>
+                            </tr>
+                            <tr>
+                                <td>Stainless steel looks plastic</td>
+                                <td>Metallic must be 1.0, not 0</td>
+                            </tr>
+                            <tr>
+                                <td>Logo is blurry</td>
+                                <td>Use higher resolution PNG (min 1024px)</td>
+                            </tr>
+                            <tr>
+                                <td>File too large</td>
+                                <td>Enable Draco compression, use Decimate modifier</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Full Guide Tab -->
+                <div class="guide-panel" id="guide-full">
+                    <div class="guide-info">
+                        <strong>Required Software:</strong> SolidWorks (already owned), Blender 4.x (free - <a href="https://www.blender.org/download/" target="_blank">blender.org</a>), Text Editor (VS Code recommended)
+                    </div>
+
+                    <!-- Phase 1: SolidWorks Export -->
+                    <div class="guide-accordion open">
+                        <div class="guide-accordion-header" onclick="toggleAccordion(this)">
+                            <span>📐 Phase 1: SolidWorks Export</span>
+                            <span class="guide-accordion-icon">▼</span>
+                        </div>
+                        <div class="guide-accordion-content">
+                            <h5>1.1 Prepare the Assembly</h5>
+                            <ol>
+                                <li><strong>Open the full assembly</strong> (not individual parts)</li>
+                                <li><strong>Simplify if needed:</strong> Hide internal components not visible from outside</li>
+                                <li><strong>Check scale:</strong> Ensure the model is in real-world units (meters preferred for web)</li>
+                            </ol>
+
+                            <h5>1.2 Export Geometry</h5>
+                            <ol>
+                                <li>Go to <strong>File → Save As</strong></li>
+                                <li>Select format: <strong>STEP AP214 (.step, .stp)</strong></li>
+                                <li>Click <strong>Options</strong> and ensure:
+                                    <ul>
+                                        <li>☑ Export assembly as: Multi-body part or Assembly</li>
+                                        <li>☑ Include curves</li>
+                                    </ul>
+                                </li>
+                                <li>Save as <code>bottom-feeder-assembly.step</code></li>
+                            </ol>
+
+                            <div class="guide-warning">
+                                <strong>Critical:</strong> SolidWorks materials don't transfer automatically. Document all materials before exporting!
+                            </div>
+
+                            <h5>1.3 Document Your Materials</h5>
+                            <p>Create a reference list matching parts to their appearances:</p>
+                            <table class="materials-table">
+                                <thead>
+                                    <tr>
+                                        <th>Part Name</th>
+                                        <th>SolidWorks Appearance</th>
+                                        <th>Target Material</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Main Housing</td>
+                                        <td>Gray Plastic</td>
+                                        <td>Matte plastic</td>
+                                        <td>Dark gray #333333</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Handle Base Plate</td>
+                                        <td>Stainless Steel - Brushed</td>
+                                        <td>Brushed metal</td>
+                                        <td>Metallic finish</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Battery Cable</td>
+                                        <td>Yellow</td>
+                                        <td>Yellow rubber/plastic</td>
+                                        <td>#FFD700 or #FFFF00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Wheels</td>
+                                        <td>Black Rubber</td>
+                                        <td>Matte rubber</td>
+                                        <td>Very rough surface</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Logo Area</td>
+                                        <td>Decal</td>
+                                        <td>Image texture</td>
+                                        <td>See logo file</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <h5>1.4 Export Textures & Decals</h5>
+                            <ol>
+                                <li><strong>Logo:</strong> Export as PNG with transparency (1024x1024 or 2048x2048 pixels)</li>
+                                <li><strong>Any other decals:</strong> Export each as a separate PNG</li>
+                                <li><strong>Note UV placement:</strong> Take a screenshot of where each decal is positioned</li>
+                            </ol>
+
+                            <h5>1.5 Export Reference Images</h5>
+                            <p>Take screenshots from SolidWorks showing the model from multiple angles (front, side, top, detail shots). These will be your reference when applying materials in Blender.</p>
+                        </div>
+                    </div>
+
+                    <!-- Phase 2: Blender Conversion -->
+                    <div class="guide-accordion">
+                        <div class="guide-accordion-header" onclick="toggleAccordion(this)">
+                            <span>🎨 Phase 2: Blender Conversion</span>
+                            <span class="guide-accordion-icon">▼</span>
+                        </div>
+                        <div class="guide-accordion-content">
+                            <h5>2.1 Install Blender</h5>
+                            <ol>
+                                <li>Download from <a href="https://www.blender.org/download/" target="_blank">blender.org</a></li>
+                                <li>Install and open Blender</li>
+                                <li>Delete the default cube (select it, press <code>X</code>, confirm)</li>
+                            </ol>
+
+                            <h5>2.2 Import the STEP File</h5>
+                            <ol>
+                                <li>Go to <strong>File → Import → STL/STEP</strong>
+                                    <ul>
+                                        <li>Note: You may need the CAD Importer add-on for STEP files</li>
+                                        <li>Alternative: Use FreeCAD to convert STEP → OBJ, then import OBJ</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                            <div class="code-block"><code>FreeCAD: File → Import → Select your .step file
+FreeCAD: File → Export → Select .obj format
+Blender: File → Import → Wavefront (.obj)</code></div>
+
+                            <h5>2.3 Organize the Model</h5>
+                            <ol>
+                                <li>In the <strong>Outliner</strong> panel, rename parts clearly (Housing_Main, Handle_StainlessSteel, etc.)</li>
+                                <li>Select all objects, press <code>Ctrl+A</code> → Apply All Transforms</li>
+                                <li>Check scale: The model should be roughly real-world size (~12-18 inches for a pool vacuum)</li>
+                            </ol>
+
+                            <h5>2.4 Apply PBR Materials</h5>
+                            <p>For each part, create a new material with these settings:</p>
+
+                            <div class="guide-phase">
+                                <h4>Stainless Steel (Brushed)</h4>
+                                <div class="code-block"><code>Material Name: StainlessSteel_Brushed
+Shader: Principled BSDF
+├── Base Color: #C0C0C0 (silver gray)
+├── Metallic: 1.0
+├── Roughness: 0.35 (for brushed finish)
+└── Specular: 0.5</code></div>
+                            </div>
+
+                            <div class="guide-phase">
+                                <h4>Yellow Tubing/Cable</h4>
+                                <div class="code-block"><code>Material Name: Yellow_Tubing
+Shader: Principled BSDF
+├── Base Color: #FFD700 (golden yellow)
+├── Metallic: 0.0
+├── Roughness: 0.5
+└── Specular: 0.3</code></div>
+                            </div>
+
+                            <div class="guide-phase">
+                                <h4>Black Rubber (Wheels, Seals)</h4>
+                                <div class="code-block"><code>Material Name: Black_Rubber
+Shader: Principled BSDF
+├── Base Color: #1A1A1A (near black)
+├── Metallic: 0.0
+├── Roughness: 0.85
+└── Specular: 0.1</code></div>
+                            </div>
+
+                            <div class="guide-phase">
+                                <h4>Gray Plastic (Housing)</h4>
+                                <div class="code-block"><code>Material Name: Gray_Plastic
+Shader: Principled BSDF
+├── Base Color: #404040 (dark gray)
+├── Metallic: 0.0
+├── Roughness: 0.4
+└── Specular: 0.4</code></div>
+                            </div>
+
+                            <h5>2.5 Apply Logo Decal</h5>
+                            <ol>
+                                <li>Select the surface where the logo goes</li>
+                                <li>Enter <strong>Edit Mode</strong> (<code>Tab</code>)</li>
+                                <li>Select the faces for the logo area</li>
+                                <li>Press <code>U</code> → Unwrap or Project from View</li>
+                                <li>In the <strong>Shader Editor</strong>, add Image Texture node → Load tbf-logo.png</li>
+                                <li>Connect to Base Color of Principled BSDF</li>
+                                <li>Adjust UV mapping in the UV Editor to position correctly</li>
+                            </ol>
+
+                            <h5>2.6 Optimize for Web</h5>
+                            <ol>
+                                <li><strong>Reduce polygon count</strong> (if model is very detailed):
+                                    <ul>
+                                        <li>Select object → Add <strong>Decimate</strong> modifier</li>
+                                        <li>Set ratio to 0.5 or lower → Apply modifier</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Target file size:</strong> Under 5MB (ideally under 2MB)</li>
+                                <li><strong>Merge close vertices:</strong> Edit Mode → Select All → Mesh → Merge → By Distance</li>
+                            </ol>
+
+                            <h5>2.7 Export as GLB</h5>
+                            <ol>
+                                <li>Select all visible objects (<code>A</code> in Object Mode)</li>
+                                <li>Go to <strong>File → Export → glTF 2.0 (.glb/.gltf)</strong></li>
+                                <li>In the export settings:</li>
+                            </ol>
+                            <div class="code-block"><code>Format: glTF Binary (.glb)    ← IMPORTANT
+
+Include:
+☑ Selected Objects
+☑ Visible Objects
+☐ Active Collection
+
+Transform:
+☑ +Y Up
+
+Compression:
+☑ Compress    ← Enables Draco compression</code></div>
+                            <ol start="4">
+                                <li>Save as <code>bottom-feeder.glb</code></li>
+                                <li><strong>Verify:</strong> Test at <a href="https://gltf-viewer.donmccurdy.com/" target="_blank">gltf-viewer.donmccurdy.com</a></li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- Phase 3: Web Implementation -->
+                    <div class="guide-accordion">
+                        <div class="guide-accordion-header" onclick="toggleAccordion(this)">
+                            <span>🌐 Phase 3: Web Implementation</span>
+                            <span class="guide-accordion-icon">▼</span>
+                        </div>
+                        <div class="guide-accordion-content">
+                            <h5>Option A: Using model-viewer (Recommended)</h5>
+                            <p>Google's web component for 3D models. Works on all modern browsers, no JavaScript knowledge required.</p>
+
+                            <h6>Add the Model File</h6>
+                            <div class="code-block"><code>/public/models/bottom-feeder.glb</code></div>
+
+                            <p>For Shopify: Settings → Files → Upload → Copy the CDN URL</p>
+
+                            <h6>Add the HTML</h6>
+                            <div class="code-block"><code>&lt;!-- Add in &lt;head&gt; section --&gt;
+&lt;script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"&gt;&lt;/script&gt;
+
+&lt;!-- Add where you want the 3D viewer --&gt;
+&lt;model-viewer
+  src="/models/bottom-feeder.glb"
+  alt="The Bottom Feeder - 3D View"
+  auto-rotate
+  rotation-per-second="30deg"
+  camera-controls
+  touch-action="pan-y"
+  shadow-intensity="1"
+  shadow-softness="0.5"
+  exposure="1"
+  environment-image="neutral"
+  style="width: 100%; height: 500px; background-color: #f5f5f5;"
+&gt;
+&lt;/model-viewer&gt;</code></div>
+
+                            <h5>Option B: Sketchfab (No Code)</h5>
+                            <ol>
+                                <li>Create account at <a href="https://sketchfab.com" target="_blank">sketchfab.com</a></li>
+                                <li>Upload your GLB file</li>
+                                <li>Configure viewer settings</li>
+                                <li>Copy embed code → Paste into website</li>
+                            </ol>
+
+                            <h5>Option C: Spline</h5>
+                            <ol>
+                                <li>Import GLB into <a href="https://spline.design" target="_blank">spline.design</a></li>
+                                <li>Add lighting, camera controls</li>
+                                <li>Export for web or get embed code</li>
+                            </ol>
+
+                            <h5>Deployment Paths</h5>
+                            <table class="materials-table">
+                                <thead>
+                                    <tr>
+                                        <th>Platform</th>
+                                        <th>Steps</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Vercel</td>
+                                        <td>Place GLB in <code>/public/models/</code>, reference as <code>/models/bottom-feeder.glb</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Shopify</td>
+                                        <td>Settings → Files → Upload → Use full CDN URL in src</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Generic</td>
+                                        <td>Upload to server/CDN, ensure CORS headers, set MIME type: <code>model/gltf-binary</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Troubleshooting -->
+                    <div class="guide-accordion">
+                        <div class="guide-accordion-header" onclick="toggleAccordion(this)">
+                            <span>🔧 Troubleshooting</span>
+                            <span class="guide-accordion-icon">▼</span>
+                        </div>
+                        <div class="guide-accordion-content">
+                            <table class="troubleshoot-table">
+                                <thead>
+                                    <tr>
+                                        <th>Problem</th>
+                                        <th>Cause</th>
+                                        <th>Solution</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Model appears black</td>
+                                        <td>Materials didn't export correctly</td>
+                                        <td>Ensure each material uses <strong>Principled BSDF</strong> shader. Check Base Color is not pure black.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Stainless steel looks plastic</td>
+                                        <td>Metallic value not set</td>
+                                        <td>Set <strong>Metallic = 1.0</strong> for all metal parts.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Model too large/small</td>
+                                        <td>Scale mismatch</td>
+                                        <td>In Blender, select all, press <code>S</code> to scale (e.g., 0.01), then <code>Ctrl+A</code> → Apply Scale.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Logo texture blurry</td>
+                                        <td>Low resolution source</td>
+                                        <td>Use minimum 1024x1024 PNG. Check UV mapping fills the space.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>File too large (&gt;10MB)</td>
+                                        <td>Too many polygons</td>
+                                        <td>Use Decimate modifier (ratio 0.3-0.5), enable Draco compression.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Blank white screen</td>
+                                        <td>WebGL issue or path error</td>
+                                        <td>Verify file path, check browser console (F12), ensure CORS allows the file.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Resources -->
+                    <div class="guide-subsection">
+                        <h5>📚 Resources</h5>
+                    </div>
+                    <ul style="margin-left: 1.5rem; color: var(--gray-700);">
+                        <li><a href="https://modelviewer.dev/" target="_blank">Model-Viewer Documentation</a></li>
+                        <li><a href="https://docs.blender.org/manual/en/latest/addons/import_export/scene_gltf2.html" target="_blank">Blender glTF Export Guide</a></li>
+                        <li><a href="https://gltf-viewer.donmccurdy.com/" target="_blank">glTF Viewer (preview files)</a></li>
+                        <li><a href="https://github.khronos.org/glTF-Validator/" target="_blank">glTF Validator (check for errors)</a></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
         <!-- Footer -->
         <footer class="footer">
             <div class="footer-brand">
@@ -2981,6 +3843,47 @@
             notebookContent.classList.toggle('expanded', isExpanded);
             expandBtn.textContent = isExpanded ? '⤡ Collapse' : '⤢ Expand';
         }
+
+        // ===== 3D Model Guide Functions =====
+        function toggleGuide() {
+            const content = document.getElementById('guideContent');
+            const btn = document.getElementById('guideExpandBtn');
+            content.classList.toggle('expanded');
+            const isExpanded = content.classList.contains('expanded');
+            btn.textContent = isExpanded ? '▲ Collapse' : '▼ Expand';
+            localStorage.setItem('tbf-guide-expanded', isExpanded);
+        }
+
+        function switchGuideTab(tab) {
+            // Update active tab styling
+            document.querySelectorAll('.guide-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.guide-tab[data-guide="${tab}"]`).classList.add('active');
+
+            // Show/hide panels
+            document.querySelectorAll('.guide-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(`guide-${tab}`).classList.add('active');
+
+            localStorage.setItem('tbf-guide-tab', tab);
+        }
+
+        function toggleAccordion(header) {
+            const accordion = header.parentElement;
+            accordion.classList.toggle('open');
+        }
+
+        // Initialize 3D guide state from localStorage
+        (function initGuide() {
+            const wasExpanded = localStorage.getItem('tbf-guide-expanded') === 'true';
+            if (wasExpanded) {
+                document.getElementById('guideContent').classList.add('expanded');
+                document.getElementById('guideExpandBtn').textContent = '▲ Collapse';
+            }
+
+            const savedTab = localStorage.getItem('tbf-guide-tab');
+            if (savedTab) {
+                switchGuideTab(savedTab);
+            }
+        })();
 
         // Initialize tab from saved state
         currentTab = localStorage.getItem('tbf-notebook-tab') || 'general';
