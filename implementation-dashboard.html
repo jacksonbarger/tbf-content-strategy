@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Bottom Feeder - Implementation Plan</title>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --primary: #0077B6;
@@ -2879,6 +2884,30 @@
         customTasks.forEach(task => renderCustomTask(task));
 
         // =========================================
+        // FIREBASE CONFIGURATION
+        // =========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEXAMPLE-REPLACE-WITH-YOUR-KEY",
+            authDomain: "tbf-content-strategy.firebaseapp.com",
+            databaseURL: "https://tbf-content-strategy-default-rtdb.firebaseio.com",
+            projectId: "tbf-content-strategy",
+            storageBucket: "tbf-content-strategy.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abc123"
+        };
+
+        // Initialize Firebase
+        let db = null;
+        let firebaseEnabled = false;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+            firebaseEnabled = true;
+        } catch (e) {
+            console.log('Firebase not configured, using localStorage fallback');
+        }
+
+        // =========================================
         // NOTEBOOK FUNCTIONALITY WITH TABS
         // =========================================
         const notebookContent = document.getElementById('notebookContent');
@@ -2887,32 +2916,65 @@
         let saveTimeout;
         let currentTab = 'general';
         let isExpanded = localStorage.getItem('tbf-notebook-expanded') === 'true';
+        let notesData = {};
 
         // Tab placeholders
         const tabPlaceholders = {
-            general: 'Jot down your general notes here...',
-            ideas: 'Brainstorm content ideas, video concepts, post topics...',
-            goals: 'Define your goals, priorities, and key objectives...',
-            todo: 'Track your to-dos, reminders, and action items...'
+            general: 'Jot down your general notes here... (shared with all users)',
+            ideas: 'Brainstorm content ideas, video concepts, post topics... (shared)',
+            goals: 'Define your goals, priorities, and key objectives... (shared)',
+            todo: 'Track your to-dos, reminders, and action items... (shared)'
         };
 
-        // Migrate old notebook data to new tab system
-        const oldNotebook = localStorage.getItem('tbf-notebook');
-        if (oldNotebook && !localStorage.getItem('tbf-notebook-general')) {
-            localStorage.setItem('tbf-notebook-general', oldNotebook);
+        // Load notes from Firebase or localStorage
+        function loadAllNotes() {
+            if (firebaseEnabled && db) {
+                db.ref('notes').on('value', (snapshot) => {
+                    notesData = snapshot.val() || {};
+                    loadTabContent(currentTab);
+                    notebookStatus.textContent = '☁️ Synced with cloud';
+                    notebookStatus.classList.add('saved');
+                });
+            } else {
+                // Fallback to localStorage
+                ['general', 'ideas', 'goals', 'todo'].forEach(tab => {
+                    notesData[tab] = localStorage.getItem(`tbf-notebook-${tab}`) || '';
+                });
+                loadTabContent(currentTab);
+            }
         }
 
         // Load saved notes for current tab
         function loadTabContent(tab) {
-            const content = localStorage.getItem(`tbf-notebook-${tab}`) || '';
-            notebookContent.value = content;
+            notebookContent.value = notesData[tab] || '';
             notebookContent.placeholder = tabPlaceholders[tab];
+        }
+
+        // Save notes to Firebase or localStorage
+        function saveNotes(tab, content) {
+            notesData[tab] = content;
+
+            if (firebaseEnabled && db) {
+                db.ref(`notes/${tab}`).set(content)
+                    .then(() => {
+                        notebookStatus.textContent = '☁️ Saved to cloud';
+                        notebookStatus.classList.add('saved');
+                    })
+                    .catch((error) => {
+                        notebookStatus.textContent = '⚠️ Save failed';
+                        console.error('Firebase save error:', error);
+                    });
+            } else {
+                localStorage.setItem(`tbf-notebook-${tab}`, content);
+                notebookStatus.textContent = '✓ Saved locally';
+                notebookStatus.classList.add('saved');
+            }
         }
 
         // Switch tab function
         function switchTab(tab) {
             // Save current tab content first
-            localStorage.setItem(`tbf-notebook-${currentTab}`, notebookContent.value);
+            saveNotes(currentTab, notebookContent.value);
 
             // Update active tab styling
             document.querySelectorAll('.notebook-tab').forEach(t => t.classList.remove('active'));
@@ -2922,9 +2984,6 @@
             currentTab = tab;
             localStorage.setItem('tbf-notebook-tab', tab);
             loadTabContent(tab);
-
-            notebookStatus.textContent = 'Auto-saved to browser';
-            notebookStatus.classList.remove('saved');
         }
 
         // Toggle expand function
@@ -2939,13 +2998,15 @@
         currentTab = localStorage.getItem('tbf-notebook-tab') || 'general';
         document.querySelectorAll('.notebook-tab').forEach(t => t.classList.remove('active'));
         document.querySelector(`[data-tab="${currentTab}"]`).classList.add('active');
-        loadTabContent(currentTab);
 
         // Initialize expand state
         if (isExpanded) {
             notebookContent.classList.add('expanded');
             expandBtn.textContent = '⤡ Collapse';
         }
+
+        // Load all notes on startup
+        loadAllNotes();
 
         // Auto-save with debounce
         notebookContent.addEventListener('input', () => {
@@ -2954,9 +3015,7 @@
 
             clearTimeout(saveTimeout);
             saveTimeout = setTimeout(() => {
-                localStorage.setItem(`tbf-notebook-${currentTab}`, notebookContent.value);
-                notebookStatus.textContent = '✓ Saved';
-                notebookStatus.classList.add('saved');
+                saveNotes(currentTab, notebookContent.value);
             }, 500);
         });
 
